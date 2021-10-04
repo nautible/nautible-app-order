@@ -1,0 +1,153 @@
+openapi: 3.0.3
+info:
+  title: nautible-app-cart
+  version: 1.0.0-SNAPSHOT
+servers:
+- url: http://localhost:8080/
+paths:
+  /cart/{cartId}:
+    get:
+      tags:
+        - RestCartService
+      operationId: getByCartId
+      summary: カート取得
+      description: カート取得
+      parameters:
+      - name: cartId
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestCart'
+        404:
+          description: not found
+          content: {}
+    delete:
+      tags:
+        - RestCartService
+      operationId: deleteByCartId
+      summary: カート削除
+      description: カート削除
+      parameters:
+      - name: cartId
+        in: path
+        description: Id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        204:
+          description: successful operation
+          content: {}
+        404:
+          description: not found
+          content: {}
+  /cart/:
+    put:
+      tags:
+        - RestCartService
+      operationId: update
+      summary: カート更新(replace all cart products)
+      description: カート更新(replace all cart products)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestCart'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestCart'
+        404:
+          description: not found
+          content: {}
+    post:
+      tags:
+        - RestCartService
+      operationId: create
+      summary: カート作成
+      description: カート作成
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestCart'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestCart'
+        404:
+          description: not found
+          content: {}
+
+components:
+  schemas:
+    RestCart:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          description: Id
+          format: int32
+          example: 123
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestCartProduct'
+    RestCartProduct:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - count
+        - allPrice
+      properties:
+        id:
+          type: integer
+          description: Id
+          format: int32
+          example: 123
+        image:
+          type: string
+          description: イメージ
+          example: images/item.png
+        name:
+          type: string
+          description: 商品名
+          example: productA
+        price:
+          type: integer
+          description: 金額
+          format: int32
+          example: 1000
+        count:
+          type: integer
+          description: 数量
+          format: int32
+          example: 100
+        allPrice:
+          type: integer
+          description: 合計金額
+          format: int32
+          example: 2000
+
