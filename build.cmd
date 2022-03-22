@@ -5,4 +5,4 @@ if not %ERRORLEVEL% == 0 (
 )
 
 :dockerbuild
-cmd /c "cd nautible-app-order-build & docker build -t %IMAGE% -f ./src/main/docker/Dockerfile.jvm ."
+cmd /c "cd nautible-app-ms-order-build & docker build -t %IMAGE% -f ./src/main/docker/Dockerfile.jvm ."
