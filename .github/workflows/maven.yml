@@ -5,7 +5,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ main ]
+    branches: [ feature/modify_name ]
 
 jobs:
   build:
@@ -22,6 +22,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: nautible/nautible-app-ms-order-manifest
+        ref: feature/modify_name
         path: nautible-ap-ms-order-manifest
         token: ${{ secrets.PAT }}
     - name: Set up JDK 11
@@ -61,34 +62,34 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-    # Azure
-    - name: pacakge with Maven for Azure
-      run: |
-        cd $GITHUB_WORKSPACE
-        mvn -B clean package -P azure --file pom.xml -Dquarkus.package.type=fast-jar
-    - name: Login via Azure CLI
-      id: login-acr
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - name: Login Azure Docker
-      id: login-azure-docker
-      uses: azure/docker-login@v1
-      with:
-        login-server: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
-        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-    - name: Order Build, tag, and push image to Azure ACR
-      id: build-image-service-acr
-      env:
-        DOCKER_BUILDKIT: 1
-        ACR_REGISTRY: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
-        ACR_REPOSITORY: nautible-app-ms-order
-      run: |
-        cd $GITHUB_WORKSPACE/nautible-app-ms-order-build
-        docker build --cache-from=$ACR_REGISTRY/$ACR_REPOSITORY:latest --build-arg BUILDKIT_INLINE_CACHE=1 -t $ACR_REGISTRY/$ACR_REPOSITORY:latest -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -f ./src/main/docker/Dockerfile.jvm .
-        docker push $ACR_REGISTRY/$ACR_REPOSITORY:latest
-        docker push $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG
+    # # Azure いったんコメントアウト（AWS対応後にまとめて対応する）
+    # - name: pacakge with Maven for Azure
+    #   run: |
+    #     cd $GITHUB_WORKSPACE
+    #     mvn -B clean package -P azure --file pom.xml -Dquarkus.package.type=fast-jar
+    # - name: Login via Azure CLI
+    #   id: login-acr
+    #   uses: azure/login@v1
+    #   with:
+    #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+    # - name: Login Azure Docker
+    #   id: login-azure-docker
+    #   uses: azure/docker-login@v1
+    #   with:
+    #     login-server: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
+    #     username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+    #     password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+    # - name: Order Build, tag, and push image to Azure ACR
+    #   id: build-image-service-acr
+    #   env:
+    #     DOCKER_BUILDKIT: 1
+    #     ACR_REGISTRY: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
+    #     ACR_REPOSITORY: nautible-app-ms-order
+    #   run: |
+    #     cd $GITHUB_WORKSPACE/nautible-app-ms-order-build
+    #     docker build --cache-from=$ACR_REGISTRY/$ACR_REPOSITORY:latest --build-arg BUILDKIT_INLINE_CACHE=1 -t $ACR_REGISTRY/$ACR_REPOSITORY:latest -t $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG -f ./src/main/docker/Dockerfile.jvm .
+    #     docker push $ACR_REGISTRY/$ACR_REPOSITORY:latest
+    #     docker push $ACR_REGISTRY/$ACR_REPOSITORY:$IMAGE_TAG
 
     - name: pull request
       id: pull-request
@@ -105,4 +106,4 @@ jobs:
         git add .
         git commit -m "update manifest"
         git push --set-upstream origin $tag
-        curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $token" "https://api.github.com/repos/nautible/nautible-app-ms-order-manifest/pulls" -d '{"title": "new image deploy request", "head": "nautible:'$tag'", "base": "main"}' -o /dev/null -w 'httpstatus:%{http_code}\n' -s
+        curl -X POST -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $token" "https://api.github.com/repos/nautible/nautible-app-ms-order-manifest/pulls" -d '{"title": "new image deploy request", "head": "nautible:'$tag'", "base": "feature/modify_name"}' -o /dev/null -w 'httpstatus:%{http_code}\n' -s
