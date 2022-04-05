@@ -1,10 +1,10 @@
 apiVersion: skaffold/v2beta12
 kind: Config
 metadata:
-  name: nautible-app-order
+  name: nautible-app-ms-order
 build:
   artifacts:
-  - image: public.ecr.aws/nautible/nautible-app-order
+  - image: public.ecr.aws/nautible/nautible-app-ms-order
   # Dockerfileを指定するやり方では、skaffoldはappのjarファイル監視し、javaコードの変更などを監視しない。
   # そのため、skaffold customを利用し、プロジェクト全体のソースを監視し、変更があった場合にはapp image ビルドを行う
     custom:
@@ -19,14 +19,14 @@ build:
 deploy:
   kustomize:
     paths:
-      - ../nautible-app-order-manifest/overlays/aws/local-dev
+      - ../nautible-app-ms-order-manifest/overlays/aws/local-dev
 
 profiles:
 - name: aws
 - name: azure
   build:
     artifacts:
-    - image: nautibledevacr.azurecr.io/nautible-app-order
+    - image: nautibledevacr.azurecr.io/nautible-app-ms-order
       custom:
         buildCommand: build.cmd azure
         dependencies:
@@ -37,4 +37,4 @@ profiles:
   deploy:
     kustomize:
       paths:
-        - ../nautible-app-order-manifest/overlays/azure/local-dev
+        - ../nautible-app-ms-order-manifest/overlays/azure/local-dev

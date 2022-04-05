@@ -1,6 +1,6 @@
 openapi: "3.0.2"
 info:
-  title: nautible-app-payment
+  title: nautible-app-ms-payment
   version: 1.0.0-SNAPSHOT
 servers:
   - url: http://localhost:8080/
