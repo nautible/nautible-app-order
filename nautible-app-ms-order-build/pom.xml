@@ -21,6 +21,10 @@
       <id>aws</id>
       <activation>
         <activeByDefault>true</activeByDefault>
+        <property>
+          <name>cloud</name>
+          <value>aws</value>
+        </property>
       </activation>
       <dependencies>
         <dependency>
@@ -31,6 +35,12 @@
     </profile>
     <profile>
       <id>azure</id>
+      <activation>
+        <property>
+          <name>cloud</name>
+          <value>azure</value>
+        </property>
+      </activation>
       <dependencies>
         <dependency>
           <groupId>${nautible.app.order.groupId}</groupId>
