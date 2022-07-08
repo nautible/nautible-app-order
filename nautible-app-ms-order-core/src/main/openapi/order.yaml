@@ -1,0 +1,436 @@
+openapi: 3.0.3
+info:
+  title: nautible-app-ms-order
+  version: 1.0.0-SNAPSHOT
+servers:
+- url: http://localhost:8080/
+paths:
+  /order/{orderNo}:
+    get:
+      tags:
+        - RestOrderService
+      operationId: getByOrderNo
+      summary: 注文取得
+      description: 注文取得
+      parameters:
+      - name: orderNo
+        in: path
+        description: 注文No
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestGetByOrderIdResponse'
+        404:
+          description: not found
+          content: {}
+    delete:
+      tags:
+        - RestOrderService
+      operationId: deleteByOrderNo
+      summary: 注文削除
+      description: 注文削除
+      parameters:
+      - name: orderNo
+        in: path
+        description: 注文No
+        required: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: successful operation
+          content: {}
+        404:
+          description: not found
+          content: {}
+  /order/:
+    put:
+      tags:
+        - RestOrderService
+      operationId: update
+      summary: 注文更新
+      description: 注文更新
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestUpdateOrderRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestUpdateOrderResponse'
+        404:
+          description: not found
+          content: {}
+    post:
+      tags:
+        - RestOrderService
+      operationId: create
+      summary: SAGA注文作成
+      description: SAGA注文作成
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RestCreateOrderRequest'
+        required: true
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestCreateOrderResponse'
+        404:
+          description: not found
+          content: {}
+  /order/findByCustomerId/{customerId}:
+    get:
+      tags:
+        - RestOrderService
+      operationId: findByCustomerId
+      summary: 注文取得
+      description: 注文取得
+      parameters:
+      - name: customerId
+        in: path
+        description: 顧客Id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestFindByCustomerIdResponse'
+        404:
+          description: not found
+          content: {}
+  /dapr/subscribe:
+    get:
+      tags:
+        - RestOrderService
+      operationId: daprSubscribe
+      summary: daprSubscribe
+      description: 'daprSubscribe.https://docs.dapr.io/developing-applications/building-blocks/pubsub/howto-publish-subscribe/#programmatic-subscriptions'
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DaprSubscribe'
+  /order/createOrderReply:
+    post:
+      tags:
+        - RestOrderService
+      operationId: createOrderReply
+      summary: SAGA注文応答
+      description: SAGA注文応答
+      requestBody:
+        content:
+          "application/cloudevents+json":
+            schema:
+              type: string
+              format: byte
+      responses:
+        200:
+          description: successful operation
+          content: {}
+components:
+  schemas:
+    RestCreateOrderRequest:
+      type: object
+      required:
+        - orderDate
+        - orderPrice
+        - deliveryName
+        - deliveryPostCode
+        - deliveryAddress
+      properties:
+        orderDate:
+          type: string
+          description: 注文日
+          format: date
+          example: '2020-01-01'
+        orderPrice:
+          type: integer
+          description: 注文金額
+          format: int32
+          example: 123
+        orderStatus:
+          type: string
+          description: 注文状況。0:注文完了,1:配送準備中,2:配送中,3:配送完了,4:キャンセル
+          enum:
+            - 'STOCK_RESERVE_ALLOCATE_DOING'
+            - 'STOCK_APPROVE_ALLOCATE_DOING'
+            - 'STOCK_REJECT_ALLOCATE_DOING'
+            - 'PAYMENT_CREATE_DOING'
+            - 'PAYMENT_REJECT_CREATE_DOING'
+            - 'ORDER_COMPLETE'
+            - 'DELIVERY_IN_PREPARATION'
+            - 'IN_DELIVERY'
+            - 'DELIVERY_COMPLETE'
+            - 'REJECT'
+            - 'CANCEL'
+            - 'ERROR'
+        delivery:
+          $ref: '#/components/schemas/RestOrderDelivery'
+        payment:
+          $ref: '#/components/schemas/RestOrderPayment'
+        products:
+          type: array
+          description: 商品
+          items:
+            $ref: '#/components/schemas/RestOrderProduct'
+    RestUpdateOrderRequest:
+      type: object
+      required:
+        - orderNo
+        - orderDate
+        - orderPrice
+        - deliveryName
+        - deliveryPostCode
+        - deliveryAddress
+      properties:
+        orderNo:
+          type: string
+          description: 注文番号
+          example: O0000000001
+        orderDate:
+          type: string
+          description: 注文日
+          format: date
+          example: '2020-01-01'
+        orderPrice:
+          type: integer
+          description: 注文金額
+          format: int32
+          example: 123
+        orderStatus:
+          type: string
+          description: 注文状況。0:注文完了,1:配送準備中,2:配送中,3:配送完了,4:キャンセル
+          enum:
+            - 'STOCK_RESERVE_ALLOCATE_DOING'
+            - 'STOCK_APPROVE_ALLOCATE_DOING'
+            - 'STOCK_REJECT_ALLOCATE_DOING'
+            - 'PAYMENT_CREATE_DOING'
+            - 'PAYMENT_REJECT_CREATE_DOING'
+            - 'ORDER_COMPLETE'
+            - 'DELIVERY_IN_PREPARATION'
+            - 'IN_DELIVERY'
+            - 'DELIVERY_COMPLETE'
+            - 'REJECT'
+            - 'CANCEL'
+            - 'ERROR'
+        delivery:
+          $ref: '#/components/schemas/RestOrderDelivery'
+        payment:
+          $ref: '#/components/schemas/RestOrderPayment'
+        products:
+          type: array
+          description: 商品
+          items:
+            $ref: '#/components/schemas/RestOrderProduct'
+    RestOrder:
+      type: object
+      properties:
+        orderNo:
+          type: string
+          description: 注文番号
+          example: O0000000001
+        orderDate:
+          type: string
+          description: 注文日
+          format: date
+          example: '2020-01-01'
+        orderPrice:
+          type: integer
+          description: 注文金額
+          format: int32
+          example: 123
+        orderStatus:
+          type: string
+          description: 注文状況。0:注文完了,1:配送準備中,2:配送中,3:配送完了,4:キャンセル
+          enum:
+            - 'STOCK_RESERVE_ALLOCATE_DOING'
+            - 'STOCK_APPROVE_ALLOCATE_DOING'
+            - 'STOCK_REJECT_ALLOCATE_DOING'
+            - 'PAYMENT_CREATE_DOING'
+            - 'PAYMENT_REJECT_CREATE_DOING'
+            - 'ORDER_COMPLETE'
+            - 'DELIVERY_IN_PREPARATION'
+            - 'IN_DELIVERY'
+            - 'DELIVERY_COMPLETE'
+            - 'REJECT'
+            - 'CANCEL'
+            - 'ERROR'
+        delivery:
+          $ref: '#/components/schemas/RestOrderDelivery'
+        payment:
+          $ref: '#/components/schemas/RestOrderPayment'
+        products:
+          type: array
+          description: 商品
+          items:
+            $ref: '#/components/schemas/RestOrderProduct'
+    RestOrderDelivery:
+      type: object
+      required:
+        - deliveryName
+        - deliveryPostCode
+        - deliveryAddress
+        - deliveryAddress
+        - deliveryPrice
+        - deliveryTel
+      properties:
+        deliveryNumber:
+          type: string
+          description: 配送番号
+          example: D0000000001
+        planDate:
+          type: string
+          description: 配送予定日
+          format: date
+          example: "2020-01-01"
+        name:
+          type: string
+          description: 配送先宛名
+          example: 'name'
+        postCode:
+          type: string
+          description: 配送先郵便番号
+          example: "123-4567"
+          pattern: "[0-9]{3}-[0-9]{4}"
+        address1:
+          type: string
+          description: 配送先住所1
+          example: 'tokyo'
+        address2:
+          type: string
+          description: 配送先住所2
+          example: 'W101'
+        price:
+          type: integer
+          description: 配送金額
+          format: int32
+          example: 123
+        tel:
+          type: string
+          description: 配送先電話番号
+          example: 03-1234-1234
+    RestOrderPayment:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: "1111-2222-3333"
+        paymentType:
+          type: string
+          description: 支払い種別。0:クレジット,1:代引き,2:コンビニ払い
+          enum:
+            - 'CREDIT'
+            - 'CASH_ON_DELIVERY'
+            - 'CONVENNIENCE_STORE_PAYMENT'
+    RestOrderProduct:
+      type: object
+      required:
+        - id
+        - price
+        - count
+      properties:
+        id:
+          type: integer
+          description: Id
+          format: int32
+          example: 123
+        price:
+          type: integer
+          description: 金額
+          format: int32
+          example: 1000
+        count:
+          type: integer
+          description: 数量
+          format: int32
+          example: 100
+    CreateOrderReply:
+      type: object
+      required:
+        - requestId
+        - status
+        - processType
+      properties:
+        requestId:
+          type: string
+          description: 処理要求を一意に表すリクエストId。
+          example: O0000000001-1234567890
+        status:
+          type: integer
+          description: 処理結果ステータス
+          example: 200
+        message:
+          type: string
+          description: メッセージ
+          example: 在庫不足
+        processType:
+          enum:
+            - 'STOCK_RESERVE_ALLOCATE'
+            - 'STOCK_APPROVE_ALLOCATE'
+            - 'STOCK_REJECT_ALLOCATE'
+            - 'PAYMENT_CREATE'
+            - 'PAYMENT_REJECT_CREATE'
+            - 'PAYMENT'
+    RestGetByOrderIdResponse:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/RestOrder'
+    RestCreateOrderResponse:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/RestOrder'
+    RestUpdateOrderResponse:
+      type: object
+      properties:
+        order:
+          $ref: '#/components/schemas/RestOrder'
+    RestFindByCustomerIdResponse:
+      type: object
+      properties:
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/RestOrder'
+    DaprSubscribe:
+      type: object
+      properties:
+        pubsubname:
+          type: string
+          description: pubsub
+          example: pubsub
+        topic:
+          type: string
+          description: topic
+          example: topic
+        route:
+          type: string
+          description: route
+          example: /order

@@ -1,4 +1,4 @@
-# nautible-app-order project
+# nautible-app-ms-order project
 このドキュメントには注文アプリケーションについて記載する。
 アプリケーション共通の内容については[こちら](https://github.com/nautible/docs/app-common/README.md)を参照。
 Quarkusアプリケーション共通の内容については[こちら](https://github.com/nautible/docs/quarkus/README.md)を参照。
@@ -35,7 +35,7 @@ Quarkusアプリケーション共通の内容については[こちら](https:/
 * [skaffoldのインストール](https://skaffold.dev/docs/install/)
 * [daprのインストール(helm)](https://docs.dapr.io/getting-started/install-dapr-kubernetes/#install-with-helm-advanced)
 * マニフェストファイルの配置
-[nautible-app-order-manifest](https://github.com/nautible/nautible-app-order-manifest)をnautible-app-orderプロジェクトと同一階層に配置する(git clone)。
+[nautible-app-ms-order-manifest](https://github.com/nautible/nautible-app-ms-order-manifest)をnautible-app-ms-orderプロジェクトと同一階層に配置する(git clone)。
 
 ## 注文処理とSAGAオーケストレーションパターンについて
 注文処理の主要な処理は以下。受注がコーディネータとなりSAGAのオーケストレーションパターンで実装。在庫サービスはSemantic Lock Countermesureとして在庫引当の状態を保持する。Daprのpubsubコンポーネントを利用し、イベント管理を行う。
@@ -60,3 +60,18 @@ Quarkusアプリケーション共通の内容については[こちら](https:/
 * 処理要求元は、取り消し処理が必要になった場合は、取り消し対象のRequestIdをIFすることで取り消し処理を行う。
 * 処理要求先は、受け取った取り消し対象のRequestIdに対して取り消し処理を行う。
 
+## サンプルアプリ利用手順
+
+### アプリケーション依存サービスの起動
+
+manifestリポジトリでマニフェストを適用する
+
+```bash
+kubectl apply -k overlays/(aws|azure)/local-dev/dependencies
+```
+### skaffoldによるアプリケーション起動
+
+```bash
+skaffold dev --profile=(aws|azure) --port-forward
+```
+※wslなどのLinux環境で実行することを前提としています
