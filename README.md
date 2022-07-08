@@ -60,3 +60,18 @@ Quarkusアプリケーション共通の内容については[こちら](https:/
 * 処理要求元は、取り消し処理が必要になった場合は、取り消し対象のRequestIdをIFすることで取り消し処理を行う。
 * 処理要求先は、受け取った取り消し対象のRequestIdに対して取り消し処理を行う。
 
+## サンプルアプリ利用手順
+
+### アプリケーション依存サービスの起動
+
+manifestリポジトリでマニフェストを適用する
+
+```bash
+kubectl apply -k overlays/(aws|azure)/local-dev/dependencies
+```
+### skaffoldによるアプリケーション起動
+
+```bash
+skaffold dev --profile=(aws|azure) --port-forward
+```
+※wslなどのLinux環境で実行することを前提としています
