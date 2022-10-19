@@ -3,6 +3,7 @@
 アプリケーション共通の内容については[こちら](https://github.com/nautible/docs/blob/main/referenceapp-architecture/README.md)を参照。
 Quarkusアプリケーション共通の内容については[こちら](https://github.com/nautible/docs/blob/main/reference/quarkus/README.md)を参照。
 
+
 ## アプリケーションの主要アーキテクチャ
 * [Java11](https://www.oracle.com/java/)
 * [Quarkus](https://quarkus.io/)
